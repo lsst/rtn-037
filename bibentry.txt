@@ -1,0 +1,9 @@
+% bibentry template for lsst.bib in https://github.com/lsst/lsst-texmf/blob/main/texmf/bibtex/bib/lsst.bib
+
+@DocuShare{RTN-037,
+   author = { Eric Neilsen },
+    title = {Architecture for Scheduler and Observing Progress Monitoring Software},
+     year = 2022,
+    month = May,
+   handle = {RTN-037},
+      url = {https://rtn-037.lsst.io } }
