@@ -4,7 +4,7 @@
 ``schedview`` Archictecture and Overview
 ========================================
 
-:URL:    https://github.com/lsst/rtn-037/outline.rst
+:URL:    https://github.com/lsst/rtn-037/blob/main/outline.rst
 :Author: Eric Neilsen
 :Date:   $Date: 2022-08-22 $
 
