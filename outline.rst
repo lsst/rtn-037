@@ -6,12 +6,18 @@
 
 :URL:    https://github.com/lsst/rtn-037/blob/main/outline.rst
 :Author: Eric Neilsen
-:Date:   $Date: 2022-08-22 $
+:Date:   $Date: 2022-08-24 $
 
 .. container:: handout
 
    This is an outline and presentation of RTN-037.
    Both the text and the architecure described are in the "prototype" phase.
+
+   The `rst2s5.py <https://docutils.sourceforge.io/docs/user/slide-shows.txt>`_
+   utility from `docutils <https://docutils.sourceforge.io/>`_ 
+   can be used to turn this outline into a presentation thus::
+
+     $ rst2s5.py --theme small-white outline.rst outline.html
 
 .. contents::
    :class: handout
@@ -19,7 +25,8 @@
 Purpose
 =======
 
-* ``schedview`` is a "home" for code filling requirements described in RTN-016.
+* ``schedview`` is a "home" for code to create figures described in
+  `RTN-016 <https://rtn-016.lsst.io/>`_.
 * Provides visualizations for:
    * Predicting Rubin Observatory/LSST scheduler behavior.
    * Identifying problems with the scheduler (before and after use).
