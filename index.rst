@@ -15,15 +15,13 @@ Abstract
 
 Tools for monitoring and exploring scheduler behaviour and survey progress are an important element of Rubin Observatory infrastructure.
 A variety of users will require these plots, and require access to them in a variety of contexts and environments.
-Examples include telescope operators monitoring the scheduler for problems during observing, managers preparing reports for funding agencies, and scientists from science working groups reviewing the effectiveness or suvey strategy as implemented.
-Tools for generating these visualizations require much of the same functionality as other elements of Rubin Observatory infrastructure.
-This document describes an architecture for development of scheduler and progress monitoring visualizations intended to avoid duplication of develpoment effort by making it easy to use use common code across different contexts (e.g. both the "First-look Analysis and Feedback Functionality" (FAFF) infrastructure being developed for the observatory and the Rubin Science Platform jupyter notebooks being developed for users and developers), and to itself reuse code developed for scheduler construction and strategy evaluationn (opsim and MAF). 
+Examples include telescope operators monitoring the scheduler for problems during observing, managers preparing reports for funding agencies, and scientists from science working groups reviewing the effectiveness of survey strategy as implemented.
+This document describes an architecture for development of scheduler and progress monitoring examination and visualization.
+The architecutre is intended to avoid duplication of develpoment effort by making it easy to use use common code across different contexts.
+Such contexts include both the "First-look Analysis and Feedback Functionality" (FAFF) infrastructure being developed for the observatory and the Rubin Science Platform jupyter notebooks being developed for users and developers.
 
 Introduction
 ============
-
-Purpose
-^^^^^^^
 
 A variety of users will require tools for monitoring scheduler behaviour and survey progress.
 RTN-016 provides a list of examples of use cases and visualizations.
@@ -31,28 +29,6 @@ The users, contexts of use, and details of the visulazations listed in RTN-016 a
 Some users will have limited software development skills, or have limited familiarity with the details of the scheduler or observing system, while others will be experts. For some use cases, the full flexibility of general analyses tools (such as python running in an ad-hoc jupyter notebook) will be required, for example when a developer is debugging a problem.
 In other cases, users will need monitoring visualizations that can alert them to problems while requiring minimal attention or interaction.
 These visualizations well be needed in the context of observatory operations as part of the "First-look Analysis and Feedback Functionality" (FAFF) infrastructure (described in SITCOMNT-025), as modules to be used in notebooks running on the Rubin Science Platform notebook aspect, as elements of RSP parameterized notebooks (SQR-062), and perhaps in other contexts as well.
-
-Scope
-^^^^^
-
-This document describes an architecture for software specific to construction of schedulery behaviour and survey progress monitoring, particularly elements that can either be shared among multiple visualizations.
-It does not describe the design of specific visualizations except as illustrative examples.
-In so far as the architecture or design of other elements (e.g. FAFF or the RSP) are described, it is only to provide context.
-
-Intended Audience
-^^^^^^^^^^^^^^^^^
-
-This document is primarily intended to be a guide for software developers either writing or mainitaining scheduler or survey progress monitoring software, or integrating such software into other systems.
-
-Illustrative use
-^^^^^^^^^^^^^^^^
-
-Consider a night on which the scheduler does something unexpected, and a team of developers uses jupyter notebooks to explore the behavior on that night.
-They will ultimately develop notebooks that create visualizations that are diagnostics useful for identifying problems (whether or not there was actually a problem on that night).
-If the developers follow a standard architecture, the code they develop will be easily adopted to be included in other environments, such as the FAFF system at the observatory.
-If there is existing code developed for other visualizations, it may be reused, reducing the development effort needed for the current use.
-If the developers extend existing tools, or package their new tools in a consistent way, it will be of use in current efforts.
-
 
 Operational Contexts
 ====================
