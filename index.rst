@@ -26,15 +26,35 @@ Introduction
 A variety of users will require tools for monitoring scheduler behaviour and survey progress.
 RTN-016 provides a list of examples of use cases and visualizations.
 The users, contexts of use, and details of the visulazations listed in RTN-016 are diverse, and not exhaustive: it is expected that many additional uses and visualizations will be discovered and the survey progresses.
-Some users will have limited software development skills, or have limited familiarity with the details of the scheduler or observing system, while others will be experts. For some use cases, the full flexibility of general analyses tools (such as python running in an ad-hoc jupyter notebook) will be required, for example when a developer is debugging a problem.
+Some illustrative use cases include:
+
+- The observing and scheduler scientists will review the current state of the survey and simulations of each upcoming night of observing to identify potential misbehavior by the scheduler before the night begins.
+- Observatory staff will review scheduler visualizations to familiarize themselves with the expected behavior of the scheduler over the course of the upcoming night.
+- Observatory staff will need to monitor visualizations of scheduler behavior to identify and diagnose problematic behavior during observing.
+- TODO NIGHT REPORTS
+- The project (who?) needs to produce periodic status reports that allow the community to assess survey progress, including updating predictions of the results of the ten year survey based on progress to the current time.
+
+Some users will have limited software development skills, or have limited familiarity with the details of the scheduler or observing system, while others will be experts.
+For some use cases, the full flexibility of general analyses tools (such as python running in an ad-hoc jupyter notebook) will be required, for example when a developer is debugging a problem.
 In other cases, users will need monitoring visualizations that can alert them to problems while requiring minimal attention or interaction.
 These visualizations well be needed in the context of observatory operations as part of the "First-look Analysis and Feedback Functionality" (FAFF) infrastructure (described in SITCOMNT-025), as modules to be used in notebooks running on the Rubin Science Platform notebook aspect, as elements of RSP parameterized notebooks (SQR-062), and perhaps in other contexts as well.
 
 Operational Contexts
 ====================
 
-FAFF
-^^^^
+..
+   Viewpoint described by IEEE 1016 5.2, Hyde 11.2.2.1
+   This wiewpoint sets scope and system boundaries: what is external, what is internal
+   provides a "black box" persepctive on the design subject
+
+The Rubin Observatory Site
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+   TODO: What piece of infrastructure provides the scheduler instances (currently pickles)? If not through the EFD, the source should be mentioned here.
+
+.. note::
+   TODO: What are the names of the components that implement the observing queue? The scheduler monitoring software can benefit from direct intergration with it, so entries on the queue can be traced to specific scheduler decisions for visualization. 
 
 First-look Analysis and Feedback Functionalty (FAFF) breakout group is addressing the question of how project will provide on-the-fly analysis and display of telemetry and other data at the observatory.
 The group has catalogued existing resources, and identified where they need to be augmented, or where new resources need to be constructed, and made recommendations about what resources should be used (SITCOMTN-025).
@@ -42,11 +62,24 @@ The group is currently defining how users will interact with existing metrics, a
 The visualization tools within the scope of this document must be able to operate within the context of the resources and interfaces described by the FAFF breakout group.
 SITCOMTN-025 recommends the creation of visualizations using Bokeh applications, to be incorporated into the observatory displays that are provided by the LSST Observatory Visualization Environement (LOVE).
 
+.. note::
+   TODO: describe the sources of data the visualization software will need to use, including the EFD and whatever provides the scheduler pickles (or whatever the pickles will be replaced with).
+
+At the observatory, the scheduler and observing progress monitoring software will run on containers deployed using kubernetes.
+The containers will include:
+
+- **FIXME: name for service that runs opsim** The simulator will run retrieve a configured instance of the scheduler from **FIXME**, complete simulations both nightly and "on demand," and store the results in **FIXME**.
+- **FIXME: name for briefing dashboard** The pre-night briefing generator will provide a web-base dashboard giving an overview of the active or upcoming night. It will read the configured instance of the scheduler from **FIXME** and one or more simulations of the upcoming night from *FIXME*, and provide a web-based dashboard giving an overview of the upcoming night.
+- ``schedview``. ``schedview`` will provide a web-based interface that allows the user to select an instance of the scheduler from snapshots stored in **FIXME**, visualize the state, and explore its behavior.
+- **FIXME: name for night report service**. A night report tool will read completed visits and metadata from the Engineering and Facility Database, snapshots of the scheduler from **FIXME**, and provide a web-based dashboard allowing exploration of the progress and scheduler behavior of the night, calling out indications possible problems. **FIXME: Maybe a static report is better here? Maybe ``schedview`` can be extended to serve both purposes? Do we need different night report tools for different audiences? Does this tool provide a separate report from other night report stuff, or is it all integrated?**
+
 Rubin Science Platform's Notebook View
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The Rubin Science Platform (RSP) has a "notebook view" that provides a jupyterhub environment.
 RSP notebooks provide access to Rubin Observatory software and many data products, but RSP instances not running at the observatory do not provide access to all of the data sources available at the observatory.
+
+The 
 
 Parametrized Notebooks
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -111,9 +144,6 @@ Note MAF metrics often take to long to be usefully included in dynamic callbacks
 Components
 ==========
 
-Rationale
-^^^^^^^^^
-
 Many of the different visualizations to be supported by ``schedview`` may have little actual code in common, beyond what is already contained in various supporting modules such as ``bokeh`` and ``rubin_sim``.
 There are, however, a few reasons why grouping the different visualizations in the same framework makes sense.
 
@@ -132,9 +162,9 @@ The division of visualizations into these architectural components is driven by 
 
 1. Conceptual coherence. The components should be intuitive to a human.
 2. Minimal coupling.
-3. Portability across different environments. Similar visualization will be needed in a variety of contexts, including within displays shown by LOVE, at the observatory, Rubin Science Platform jupyter notebooks, jupyter notebooks run locally on laptops, and parametrized notebooks.
-Some parts of the code will need to be shared across all of these environments, while others will need to have different implementations on different environments.
-Code that can be shared across different environments should be isolated in separate components from that which may vary.
+3. Portability across different environments.
+   Similar visualization will be needed in a variety of contexts, including within displays shown by LOVE, at the observatory, Rubin Science Platform jupyter notebooks, jupyter notebooks run locally on laptops, and parametrized notebooks.
+   Some parts of the code will need to be shared across all of these environments, while others will need to have different implementations on different environments. Code that can be shared across different environments should be isolated in separate components from that which may vary.
 
 The first two of these are standard software design principles.
 The third enables use in the environments listed in `Operational Contexts`_: code that needs to be different in different contexsts should be isolated in separate modules, such that context-independent code can be shared amoung context while context-dependent code is not.
@@ -143,23 +173,23 @@ Division roughly corresponding to stages an a data flow from the source to the u
 
 1. **Collection**. Code that handles collection of data such as loading files from disk, downloading them from a URL, or querying a database. 
    A single visualization may have multiple implementations of its collection element, each supporting a different source for data or operational context.
-   This code is organized into the ``collect`` submodule of ``schedview``.
+   This ``collect`` submodule of ``schedview`` containts collection code.
 2. **Munging**. Code that filters or reformats the collected data and places it in a format that can be used directly to instantiate ``bokeh`` data sources.
    See the `Providing Data <https://docs.bokeh.org/en/latest/docs/user_guide/data.html>`_ page of the ``bokeh`` documentation.
    The ``bokeh`` API is flexible, and in many cases well be able to accept data as read.
    In these cases, a visualization may not include this element at all.
-   This code is organized into the ``munge`` submodule of ``schedview``.
+   The ``munge`` submodule of ``schedview`` contains code for munging.
 3. **Computation**. Some visualizations may require processing and calculation beyoned that is reasonably considered munging, for example running an ``opsim`` simulation.
    If this code is included within the ``schedview`` module at all, it should be placed in the ``compute`` submodule.
 4. **Plotting**. The plotting architectural element constructs a high-level ``bokeh`` object (an instance of ``bokeh.models.Plot``, ``bokeh.modules.Figure``) from data provided by earlier steps. 
    Not all operational context support ``python`` callbacks, so only ``javascript`` callbacks should be included in this element.
    This element may also include an API for modifying the models within the plot, thereby supporting manipulation of the plot using ``python`` code, for   example in cells of a ``jupyter`` notebook.
-   This code is organized into the ``plot`` submodule of ``schedview``. 
+   The ``plot`` submodule of ``schedview`` contains this code.
 5. **Application**. Full ``bokeh`` "applications" support ``python`` callbacks, not just ``javascript`` ones. 
    The applications architectural element supplements the plotting code from the plotting element to include ``python`` callbacks where they are useful.
    Whenever possible, the callbacks should be implemented my simple callback registrations of ``bokeh`` model events to calls of the API for modifying the plot's ``bokeh`` models already implemented in the plotting element.
    The applications submodule also includes the code required to start the ``bokeh`` application itself.
-   This code is organized in the ``app`` submodle of ``schedviews``.
+   The ``app`` submodle of ``schedviews`` contains this code.
 
 Not all visualizations will require all achitectural elements.
 In particular, many will not require munging or computation elemenets.
@@ -176,8 +206,104 @@ Data provided to Bokeh
 There should be some standard conventions for column names in the instances of ``ColumnDataSource``, so that (for example) a healpix maps generated from different data can be mixed and matched with different visualizations of healpix maps.
 
 
+..
+   Viewpoints are a concept used in IEEE standards for architecture and design documents.
+   I copy my notes on them here to serve as inspiration for organizing this document, but do not intend to follow the standards.
+   In the notes below, I mix the architecture and design viewtypes.
+
+..
+   Module
+   ======
 
 
+..
+   Composition
+   ===========
+
+   Viewpoint described in IEEE 1016 5.3, Hyde 11.2.2.1
+   "design subject is (recursively) structured into constituent parts and establishes the roles of those parts"
+   High level component diagram: shows composition, use, and generalization
+   Mostly deprecated in favor of structure and logical viewpoints
+
+..
+   Logical
+   =======
+
+   Viewpoint described in IEEE 1016 5.4, Hyde 11.2.2.3
+   Shows types (classes), interfactes, structural definitions, objects the design uses
+   Typically uses UML class diagrams and a data dictionary
+   Shows dependency, association, aggregation, composition, inheretance
+
+..
+   Dependency
+   ==========
+
+   Viewpoint descirbed in IEEE 1016 5.5, Hyde 11.2.2.4
+   Mostly deprecated
+   UML component diagriams or package diagram with dependencies shown
+
+..
+   Information/Database
+   ====================
+
+   Viewpoint described in IEEE 1016 5.6, Hyde 11.2.2.5
+   Describes *persistent* data usage
+   Shows data access schemes, data management strategies, data storage mechanisms
+
+..
+   Patterns
+   ========
+
+   Viewpoint described in IEEE 1016 5.7, Hyde 11.2.2.7
+   Describes design patterns used
+
+..
+   Interfaces
+   ==========
+
+   Viewpoint described in IEEE 1016 5.8, Hyde 11.2.2.8
+   Describes APIs
+   UML component diagriams
+   Interface specifications for each entity
+
+..
+   Structure
+   =========
+
+   Viewpoint described in IEEE 1016 5.9, Hyde 11.2.2.8
+   UML composite structure diagrams, class diagrams, package diagrams
+
+..
+    Interaction
+    ===========
+
+    Viewpoint described in IEEE 1016 5.10, Hyde 11.2.2.9
+    "main place where you define activities that take place in the software"
+    allocates responsibilities in collaborations
+    UML interaction diagrams
+
+..
+   State dynamics viewpoint
+   ========================
+
+   Viewpoint described in IEEE 1016 5.11, Hyde 11.2.2.10
+   UML statechart diagram
+   describes modes, states, transitions, reactions to events
+
+
+..
+   Algorithms
+   ==========
+
+   Viewpoint described in IEEE 1016 5.12, Hyde 11.2.2.11
+   describes algorithms
+
+..
+   Resource
+   ========
+
+   Viewpoint described in IEEE 1016 5.13, Hyde 11.2.2.12
+   Deprecated, use context viewpoint instead
 
 ..
    Viewpoint n
@@ -191,6 +317,7 @@ There should be some standard conventions for column names in the instances of `
 
    Design rationales n
    ^^^^^^^^^^^^^^^^^^^
+
 
 .. Make in-text citations with: :cite:`bibkey`.
 .. Uncomment to use citations
