@@ -79,13 +79,21 @@ Rubin Science Platform's Notebook View
 The Rubin Science Platform (RSP) has a "notebook view" that provides a jupyterhub environment.
 RSP notebooks provide access to Rubin Observatory software and many data products, but RSP instances not running at the observatory do not provide access to all of the data sources available at the observatory.
 
-The 
+Scheduler and observing progress monitoring tools will provide a collection of ``python`` modules to support flexible exploration of scheduler behavior and progress, both of previously completed observing and simulated future observing.
+These modules will include:
+
+- **collection** The ``collection`` module retrieves data needed for exploration and visualization, and makes it available within the ``jupyter`` notebook. **FIXME: Where will this data come from?**
+- **simulation** Utilities that simplify the execution of ``opsim`` simulations in the context of understanding past or hypothetical situations, or from a given starting point to the a given time in the future, may be required. Most of the code involved will be contained in ``opsim`` itself, but some tools to launch simulations with appropriate parameters, archive and organize results, and otherwise intergrate it into the monitoring or progress context may be needed. **FIXME: Think this through more, or just put it all in opsim?**
+- **plotting** Specialized figure for specific kinds of scheduler or progress data will be supported in a ``plots`` submodule. Examples will include maps in custom sky projections and hourglass plots. In most cases, however, ``holoviews`` should be usable directly on data returned by the ``collection`` module, so normal plots (e.g. scatter plots and histograms) will not need specialized code.
+- **dashboards** Collections of plots and controls that support specific use cases hand be implemented as dashboards that be displayed within a jupyter notebook.
 
 Parametrized Notebooks
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Instead of being developed ad-hoc, standard jupyter notebooks can be published with customizable parameters to implement live dashboards and reports (SQR-062, SITCOMTN-025).
-Progress and scheduler visualizations should support inclusion in these reports. 
+Progress and scheduler visualizations should support inclusion in these reports.
+
+Parametrized notebooks will require the same set of modules as the RSP context.
 
 Local
 ^^^^^
@@ -97,40 +105,6 @@ It may be usefull to bypass the production data provided in the RSP and use spec
 Resources
 =========
 
-Bokeh
-^^^^^
-
-Bokeh consists of two major components: 
-
-The ``BokehJS`` ``javascript`` library
-  for displaying a (possibly interactive) visualization specified by a collection of objects serialized in a ``json`` file.
-The ``bokeh`` ``python`` module
-  provides tools for creating and manipulating plot elements and collecting them into a ``bokeh.document`` serializing them in ``json`` that can be used by ``BokehJS``.
-  The module also includes tools for and generating html, jupyter cells, or full applications that use ``BokehJS`` to display the modeled visualizations.
-
-The key concept in understanding ``bokeh`` is that of a model.
-Each ``bokeh`` model has three representations of interest: an instance of a ``python`` class, ``json`` that can be included in a ``bokeh`` document, and an instance of of ``javascript`` object. A few representative examples of bokeh models are:
-
-- **Sources of data**, for example, ``bokeh.models.ColumnDataSource`` is a table of data which can be created from python dictionaries or ``pandas.DataFrames`` using the ``bokeh`` python module.
-- **Axes**
-- **Glyphs**, for example markers of various shapes, lines, bars, wedges, and other markers that might appear on a plot.
-- **Annotations**
-- **Scales**
-- **Selections**, specifying elements users can use to interactively select data on a plot.
-- **Layouts**, specifying how different plot elements should be arranged.
-- **Callbacks**, which map events to calls of either ``javascript`` code (embedded within the callback objects themselves) or ``python`` code (if the ``BokehJS`` library can contact the appropriate server run built using the ``bokeh`` python module.)
-- **Controls** such as sliders, buttons, and text input boxes.
-- **Plots** combine other models into a unified whole in top-level layout.
-
-The ``bokeh`` python module includes both a low-level API, which supports direct maniuplation of these models, and a high-level API, which resembles the plotting interfaces of other python plotting packages such as ``matplotlib``, and requires less understanding of the underlying architecture.
-
-In the simplest use, a developer uses the ``bokeh`` python module to build the models needed by desired plot, and either exports the result to an ``html`` file or displays it in a ``jupyter`` cell.
-The ``html`` (either exported to its own file or displayed in the ``jupyter`` cell) contains everything required for the plot, including the data itself and the javascript code for the javascript callbacks: interactive elements implemented using javascript callbacks are fully functional when loaded from the static html files.
-
-If bokeh is being used within a jupyter notebook, the user can continue to modify of the ``python`` objects representing the ``bokeh`` models, and the changes can be "emmitted" to the ``javascript`` used by the plot, modifying the ``javascript`` objects and corresponding visualization accordingly.
-
-If the web server built into the ``bokeh`` python module is being used to serve the plot's html, the python object representing the bokeh models can (optionally) be updated automatically when the javascript objects in the user's browser are update (e.g. by the user hitting a button, entering text in a text box, or triggering a javascript callback). Furthermore, callbacks written in python can be triggered, updating the python reperentation of the models and pushing the updates to the javascript represenations in the user's browser.
-
 MAF
 ^^^
 
@@ -140,9 +114,43 @@ For example, there should be a standard way for maps from metrics calculated on 
 
 Note MAF metrics often take to long to be usefully included in dynamic callbacks, but this will not be necessary for many uses.
 
+Bokeh
+^^^^^
+
+Bokeh is a plotting tool which consists of two major components: 
+
+The ``BokehJS`` ``javascript`` library
+  for displaying a (possibly interactive) visualization specified by a collection of objects serialized in a ``json`` file.
+The ``bokeh`` ``python`` module
+  provides tools for creating and manipulating plot elements and collecting them into a ``bokeh.document`` serializing them in ``json`` that can be used by ``BokehJS``.
+  The module also includes tools for and generating html, jupyter cells, or full applications that use ``BokehJS`` to display the modeled visualizations.
+
+Bokeh can be used in serveral ways, including:
+
+- Within a jupyter notebook.
+- As a stand-alone web service.
+- Embedded within a bespoke web page.
+- Within a dashboard created using holoviz panel or lumen.
+- As a "back-end" for higher level plotting and dashboard constuction tools in holoviz.
 
 Components
 ==========
+
+Observatory Site Service containers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There will be a collection of containers deployed at the observatory, each of which hosts a web service that shows a dashboard that presents a collection of tables and visualizations useful for observing.
+These will include:
+
+- **Pre-night briefing dashboard**, showing visualizations and data useful for verifying the scheduler's readiness for an approaching night of observing, letting the observatory staff know what to expect, and preparing them to identify anamolous behavior that might require intervention.
+- **Scheduler supervisor**, showing visualizations and data that help observatory staff and others understand the scheduler state and behavior when it is active.
+- **Night summary dashboard**, providing visualizations and data tha summarizes the previous night. This might be implemented as an element of a different system or display whose scope extends beyond the scheduler itself. **FIXME: look into how the general purpose night summary will be implemented**
+
+.. note::
+   TODO: opsim simulation will need to be run in support of the pre-night briefing and night summary. At least one (and possibly several) simulations will need to be run automatically before each night of observing, and the automatic simulations may need to be supplemented or replaced through human intervention. Finally, the results of these simulations need to be supplied to the dashboards. Should this be done with an additional container, within the scope of this document? Is there an existing element of the site infrastructure that should supply this survice?
+
+The ``schedview`` python module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Many of the different visualizations to be supported by ``schedview`` may have little actual code in common, beyond what is already contained in various supporting modules such as ``bokeh`` and ``rubin_sim``.
 There are, however, a few reasons why grouping the different visualizations in the same framework makes sense.
@@ -197,13 +205,11 @@ Visualizations to be run in multiple contexts may need multiple implementations 
 
 Although different visualizations will share this architecture, they may not share any actual code: there is **no** requirement that all implementations of a given element be classes that inheret from a common parent class, for example. 
 
-Interfaces
-==========
+Survey progress simulations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Data provided to Bokeh
-^^^^^^^^^^^^^^^^^^^^^^
-
-There should be some standard conventions for column names in the instances of ``ColumnDataSource``, so that (for example) a healpix maps generated from different data can be mixed and matched with different visualizations of healpix maps.
+Severaly visualizations will require revised values for survey metric, calculated using simulations starting from a specific time (e.g. the current time) and running through the end of the survey.
+The ``opsim`` and ``maf`` submodules of the ``rubin_sim`` module will be used to run the simulations and calculate corresponding metrics, but infrastructure is required to automatically (and manually) launch such simulations, collect and archive the results (including scheduler snapshots, ``opsim`` output, and ``maf`` output), and provide and interface to provide access to these data.
 
 
 ..
