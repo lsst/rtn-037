@@ -205,12 +205,25 @@ Visualizations to be run in multiple contexts may need multiple implementations 
 
 Although different visualizations will share this architecture, they may not share any actual code: there is **no** requirement that all implementations of a given element be classes that inheret from a common parent class, for example. 
 
-Survey progress simulations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Survey simulator
+^^^^^^^^^^^^^^^^
 
 Severaly visualizations will require revised values for survey metric, calculated using simulations starting from a specific time (e.g. the current time) and running through the end of the survey.
 The ``opsim`` and ``maf`` submodules of the ``rubin_sim`` module will be used to run the simulations and calculate corresponding metrics, but infrastructure is required to automatically (and manually) launch such simulations, collect and archive the results (including scheduler snapshots, ``opsim`` output, and ``maf`` output), and provide and interface to provide access to these data.
 
+The survey simulator will need to run automatically under a variety of conditions:
+
+1. In the day following each night of observing, a simulation will need to be run from the end of that night through the end of the survey, using baseline simulation weather.
+2. In the day following each night of observing, a simulation will need to be run from the end of the next night through the end of the survey, using baseline simulation weather, but excluding data from the most recent night. That is, simulate the result of the survey if the entire next night is lost, and the rest of the simualtion after that follows baseline conditions.
+3. In the day following each night of observing, a simulation will need to be run from the end of that night through the end of the next night, with no clouds and good seeing, follow by a simulation of the rest of the survey under baseline conditions. That is, simulate the result of the survey if the entire next night is clear with good seeing, and the rest of the simualtion after that follows baseline conditions.
+4. In the day following each night of observing, a simulation will need to be run from the end of that night through the end of the next night, with no clouds and poor seeing, follow by a simulation of the rest of the survey under baseline conditions. That is, simulate the result of the survey if the entire next night is clear with poor seeing, and the rest of the simualtion after that follows baseline conditions.
+
+For each of these survey, a suite of MAF metrics will need to be evaluated at the current time, the end of the following night, and the end of the survey.
+
+Survey visit database and scheduler instance archive
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ 
 
 ..
    Viewpoints are a concept used in IEEE standards for architecture and design documents.
@@ -226,7 +239,7 @@ The ``opsim`` and ``maf`` submodules of the ``rubin_sim`` module will be used to
    Composition
    ===========
 
-   Viewpoint described in IEEE 1016 5.3, Hyde 11.2.2.1
+   Viewpoint described in IEEE 1016 5.3, Hyde 11.2.2.2
    "design subject is (recursively) structured into constituent parts and establishes the roles of those parts"
    High level component diagram: shows composition, use, and generalization
    Mostly deprecated in favor of structure and logical viewpoints
