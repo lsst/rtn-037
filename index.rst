@@ -143,7 +143,7 @@ There will be a collection of containers deployed at the observatory, each of wh
 These will include:
 
 - **Pre-night briefing dashboard**, showing visualizations and data useful for verifying the scheduler's readiness for an approaching night of observing, letting the observatory staff know what to expect, and preparing them to identify anamolous behavior that might require intervention.
-- **Scheduler supervisor**, showing visualizations and data that help observatory staff and others understand the scheduler state and behavior when it is active.
+- **Scheduler viewer**, showing visualizations and data that help observatory staff and others understand the scheduler state and behavior when it is active.
 - **Night summary dashboard**, providing visualizations and data tha summarizes the previous night. This might be implemented as an element of a different system or display whose scope extends beyond the scheduler itself. **FIXME: look into how the general purpose night summary will be implemented**
 
 .. note::
