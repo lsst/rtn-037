@@ -102,36 +102,6 @@ Developers will want to use visualization tools locally, for example on their ow
 Code for this context may also be useful even in the RSP notebook. For example, code for a "local" context will need to be able to used data stored in arbitrary local files.
 It may be usefull to bypass the production data provided in the RSP and use specially crafted local files for testing.
 
-Resources
-=========
-
-MAF
-^^^
-
-Many of the metrics to be visualized are already implemented in MAF using matplotlib.
-When they become important to implement in this framework, they should use the MAF code in ``rubin_sim`` rather than implement new code.
-For example, there should be a standard way for maps from metrics calculated on a healpix spatial slicer to be converted to bokeh DataSource objects, so the same software for visualizing maps can be used for arbitrary maps from MAF.
-
-Note MAF metrics often take to long to be usefully included in dynamic callbacks, but this will not be necessary for many uses.
-
-Bokeh
-^^^^^
-
-Bokeh is a plotting tool which consists of two major components: 
-
-The ``BokehJS`` ``javascript`` library
-  for displaying a (possibly interactive) visualization specified by a collection of objects serialized in a ``json`` file.
-The ``bokeh`` ``python`` module
-  provides tools for creating and manipulating plot elements and collecting them into a ``bokeh.document`` serializing them in ``json`` that can be used by ``BokehJS``.
-  The module also includes tools for and generating html, jupyter cells, or full applications that use ``BokehJS`` to display the modeled visualizations.
-
-Bokeh can be used in serveral ways, including:
-
-- Within a jupyter notebook.
-- As a stand-alone web service.
-- Embedded within a bespoke web page.
-- Within a dashboard created using holoviz panel or lumen.
-- As a "back-end" for higher level plotting and dashboard constuction tools in holoviz.
 
 Components
 ==========
@@ -203,6 +173,37 @@ Containers
 
 There will be a container for each dashboard, deployable at the observatory using kubernetes.
  
+Resources
+=========
+
+MAF
+^^^
+
+Many of the metrics to be visualized are already implemented in MAF using matplotlib.
+When they become important to implement in this framework, they should use the MAF code in ``rubin_sim`` rather than implement new code.
+For example, there should be a standard way for maps from metrics calculated on a healpix spatial slicer to be converted to bokeh DataSource objects, so the same software for visualizing maps can be used for arbitrary maps from MAF.
+
+Note MAF metrics often take to long to be usefully included in dynamic callbacks, but this will not be necessary for many uses.
+
+Bokeh
+^^^^^
+
+Bokeh is a plotting tool which consists of two major components: 
+
+The ``BokehJS`` ``javascript`` library
+  for displaying a (possibly interactive) visualization specified by a collection of objects serialized in a ``json`` file.
+The ``bokeh`` ``python`` module
+  provides tools for creating and manipulating plot elements and collecting them into a ``bokeh.document`` serializing them in ``json`` that can be used by ``BokehJS``.
+  The module also includes tools for and generating html, jupyter cells, or full applications that use ``BokehJS`` to display the modeled visualizations.
+
+Bokeh can be used in serveral ways, including:
+
+- Within a jupyter notebook.
+- As a stand-alone web service.
+- Embedded within a bespoke web page.
+- Within a dashboard created using holoviz panel or lumen.
+- As a "back-end" for higher level plotting and dashboard constuction tools in holoviz.
+
 
 ..
    Viewpoints are a concept used in IEEE standards for architecture and design documents.
