@@ -147,6 +147,14 @@ The survey simulator will need to run automatically under a variety of condition
 
 For each of these survey, a suite of MAF metrics will need to be evaluated at the current time, the end of the following night, and the end of the survey.
 
+The simulation generator will also store resultant visit databases, MAF metrics, and snapshots of the scheduler instances will need to be saved in visit database archives along with corresponding metadata.
+
+In addition to running automatically, the simulation generator will also need to be configured and run manually.
+Such manually run simulations will differ from those run using ``opsim`` directly in that it will handle interactions with the `Simulation and schedule instance archive`_ automatically.
+
+.. note::
+   FIXME: Should the simulation generator be part of ``rubin_sim``, ``schedview``, or something else entirely?
+
 Dashboards
 ^^^^^^^^^^
 
