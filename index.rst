@@ -109,9 +109,9 @@ Components
 Figure generators
 ^^^^^^^^^^^^^^^^^
 
-The ``schedview`` python module provides a collection of functions each of which provides a figure that may be either used in isolation, or included as an element of a dashboard.
-Examples of figures produced by such functions include a table of astronomical events, histograms of visit parameters (e.g. R.A., Declination, LST, depth), a table of visits in a given time window, sky maps of scheduler reward basis functions at a given time,  and many others; see section 5.1 of RTN-048 for a list.
-Each figure generation function will consist of the following compononts:
+The ``schedview`` python module provides a collection of classes whose instances generate figures that may be either used in isolation, or included as an element of a dashboard.
+Examples of figures produced by such generators include a table of astronomical events, histograms of visit parameters (e.g. R.A., Declination, LST, depth), a table of visits in a given time window, sky maps of scheduler reward basis functions at a given time,  and many others; see section 5.1 of RTN-048 for a list.
+Each figure generator will generate plots using a "pipe and filter" architucture, with the following filter compononts:
 
 1. **Collection**. Code that handles collection of data such as loading files from disk, downloading them from a URL, or querying a database. 
    A single visualization may have multiple implementations of its collection element, each supporting a different source for data or operational context.
@@ -127,9 +127,11 @@ Each figure generation function will consist of the following compononts:
 4. **Plotting**. The plotting architectural element creates a visualization object that can be used directly in a dashboard, displayed in a jupyter notebook, or written to disk as a `pdf`, `png`, or `jpeg` file.
    Examples include an instance of ``bokeh.models.Plot``, ``bokeh.modules.Figure``.
 
-Different figure generation functions may share some of these elements with other such functions.
+A figure may sometimes include multiple collection, munging, or computation components, if multiple sets of data will overplotted on the same figure.
+
+Different figure generators may share some of these elements with other such functions.
 For example, different visualizations of the same data are likely to use the same collection code.
-Other figure generation functions may be completely independent of each other, and share no code at all: there is no expectation, for example, that each visualization be a subclass of the same superclass, or that the components used by any given visualization derive from a common superclass of components of other figure generation functions.
+there is no expectation, for example, that each visualization be a subclass of the same superclass, or that the components used by any given visualization derive from a common superclass of components of other figure generation functions.
 This design permits but does not require such code reuse.
 
 Simulation generators
@@ -158,7 +160,7 @@ Such manually run simulations will differ from those run using ``opsim`` directl
 Dashboards
 ^^^^^^^^^^
 
-Although the simulation generation functions will sometimes be used directly  in ``jupyter`` notebooks, commonly needed figures will be collected together in a set of dasboards, web applications that generate web pages preseting a collection of figures.
+Although the figure generators will sometimes be used directly  in ``jupyter`` notebooks, commonly needed figures will be collected together in a set of dasboards, web applications that generate web pages preseting a collection of figures.
 
 Such dashboards will include:
 
@@ -166,6 +168,9 @@ Such dashboards will include:
 - **Scheduler viewer**, showing figures that help observatory staff and others understand the scheduler state and behavior when it is active.
 - **Night summary dashboard**, providing figures that summarizes the previous night. This might be implemented as an element of a different system or display whose scope extends beyond the scheduler itself. **FIXME: look into how the general purpose night summary will be implemented**
 - **Survey progress and survey performance dashboard**, providing figures that summarizes the survey progress, current state of the survey, and performance of the scheduler.
+
+Dashboards may not necessarily create figures using the figure generators, but may call individual elements of the figure generation pipeline directly.
+In particular, when multiple figures in the same dashboard require the same data set, the initial components of the figure generation pipeline (collection, munging, computation) should only be called once, and the result of this sub-pipeline fed into multiple plotting components.
 
 Simulation and schedular instance archive
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
