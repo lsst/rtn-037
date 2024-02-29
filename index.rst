@@ -61,40 +61,49 @@ Examples of figures produced by such generators include a table of astronomical 
    The ``compute`` submodule of ``schedview`` (``schedview.compute``) contains computing code.
 3. **Plotting**. The plotting architectural element creates a visualization object that can be used directly in a dashboard, displayed in a jupyter notebook, or written to disk as a `pdf`, `png`, or `jpeg` file.
    When plotting using ``bokeh``, this will be an instance of ``bokeh.modules.Figure`` or one of its subclasses, e.g. ``bokeh.models.Plot``.
-   The ``plot`` submodule of ``schedview`` (``schedview.plot``) contains such plotting code.
+   Functionality in the ``schedview`` repository is intended to be specific, rather than general purpose plotting tools.
+   For example, ``schedview`` includes a function to plot camera pointings with the footprint outline over a healpix map, but the general purpose functionality for making sky maps (including plotting healpix maps and polygons) is provided by a separate module (``uranography``) in a different repository.
+   In this way, general purpose plotting code can be reused without requiring ``schedview`` and its scheduler-specific dependencies.
+   The ``plot`` submodule of ``schedview`` (``schedview.plot``) contains such ``schedview`` plotting code.
 4. **Driver**. Driver architectural elements use colletion, computation, and plotting elements to create finished visualizations.
    Examples include `panel` dashboards and `jupyter` notebooks (paramterized or not).
    Although some driver code resides in the `schedview` module, it is not expect that all such code will be hosted there: some dashboards or notebooks that call collection, computation, and plotting elements and use the results to create finished reports or dashboards are expected to reside in other repositories as well.
 
 Generation of a figure may sometimes requrire multiple collection, munging, or computation components, if multiple sets of data will overplotted on the same figure.
 
-Different figure generators may share some of these elements with other such functions.
-For example, different visualizations of the same data are likely to use the same collection code.
-there is no expectation, for example, that each visualization be a subclass of the same superclass, or that the components used by any given visualization derive from a common superclass of components of other figure generation functions.
+There is no expectation that each visualization be a subclass of the same superclass, or that the components used by any given visualization derive from a common superclass of components of other figure generation functions.
 This design permits but does not require such code reuse.
 
 Simulation generators
 ^^^^^^^^^^^^^^^^^^^^^
 
 Several visualizations will require revised values for survey metrics, calculated using simulations starting from a specific time (e.g. the current time) and running through the end of the survey.
-The ``opsim`` and ``maf`` submodules of the ``rubin_sim`` module will be used to run the simulations and calculate corresponding metrics, but infrastructure is required to automatically (and manually) launch such simulations, collect and archive the results (including scheduler snapshots, ``opsim`` output, and ``maf`` output), and provide and interface to provide access to these data.
+The ``opsim`` and ``maf`` submodules of the ``rubin_sim`` module will be used to run the simulations and calculate corresponding metrics, but infrastructure is required to automatically (and also manually) launch such simulations, collect and archive the results (including scheduler snapshots, ``opsim`` output, and ``maf`` output), and provide and interface to provide access to these data.
 
 The survey simulator will need to run automatically under a variety of conditions:
 
-1. In the day following each night of observing, a simulation will need to be run from the end of that night through the end of the survey, using baseline simulation weather.
-2. In the day following each night of observing, a simulation will need to be run from the end of the next night through the end of the survey, using baseline simulation weather, but excluding data from the most recent night. That is, simulate the result of the survey if the entire next night is lost, and the rest of the simualtion after that follows baseline conditions.
-3. In the day following each night of observing, a simulation will need to be run from the end of that night through the end of the next night, with no clouds and good seeing, follow by a simulation of the rest of the survey under baseline conditions. That is, simulate the result of the survey if the entire next night is clear with good seeing, and the rest of the simualtion after that follows baseline conditions.
-4. In the day following each night of observing, a simulation will need to be run from the end of that night through the end of the next night, with no clouds and poor seeing, follow by a simulation of the rest of the survey under baseline conditions. That is, simulate the result of the survey if the entire next night is clear with poor seeing, and the rest of the simualtion after that follows baseline conditions.
+1. During the day before each night of observing, a set of simulations will need to be run for the following night (and maybe two nights) under a variety of weather conditions and starting times. Likely examples include:
 
-For each of these survey, a suite of MAF metrics will need to be evaluated at the current time, the end of the following night, and the end of the survey.
+   a. Good seeing, first exposure exactly at the nominal starting time.
+   b. Good seeing, first exposure a few minutes later than the nominal starting time (simulating a late start due to technical or operational delays).
+   c. Poor seeing, first exposure exactly at the nominal starting time.
+   d. Good seeing, first exposure two hours later than the nominal starting time (simulating a delayed start due to weather).
+   d. Cloud, wind, and seeing conditions predicted by meteorologists, first exposure exactly at the nominal starting time or when the weather is first predicted to be good enough to start observing, whichever is earlier.
+
+
+2. On a periodic basis (daily? weekly? quarterly?), a set of simulations will need to be run showing how the achieved data collected in that period affects predicted final metrics. Likely examples include:
+
+   a. A simulation beginning at the end of the period, starting with the current actual state of the survey and running through the end of the survey.
+   b. A simulation beginning at the start of the period, and running through the end of the survey using baseline conditions. Comparison with the previous simulation will show how differences between the actual and baseline predicted exposures affect the final survey.
+   c. A simulation beginning at the end of the period and running through the end of the survey in baseline weather conditions, including no visits during the period in question. This simulation demonstrates how the worst possible observing in that period would have affected the final survey.
+   d. A simulation beginning at the start of the period and running through the end of the survey, with no clouds, wind, or bad seeing during the perioud under study, and baseline conditions thereafter. This simulation will show how the best possible observing in the period affects the final survey.
+
+For each of these survey, a suite of MAF metrics will need to be evaluated at the current time and the end of the survey.
 
 The simulation generator will also store resultant visit databases, MAF metrics, and snapshots of the scheduler instances will need to be saved in visit database archives along with corresponding metadata.
 
 In addition to running automatically, the simulation generator will also need to be configured and run manually.
-Such manually run simulations will differ from those run using ``opsim`` directly in that it will handle interactions with the `Simulation and schedule instance archive`_ automatically.
-
-.. note::
-   FIXME: Should the simulation generator be part of ``rubin_sim``, ``schedview``, or something else entirely?
+Such manually run simulations will differ from those run using ``opsim`` directly in that it will handle interactions with an archive a simulations and derived data automatically.
 
 Dashboards
 ^^^^^^^^^^
