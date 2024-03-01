@@ -11,12 +11,6 @@
 
 % Metadata such as the title, authors, and description are set in metadata.yaml
 
-% TODO: Delete the note below before merging new content to the main branch.
-
-:::{note}
-**This technote is a work-in-progress.**
-:::
-
 ## Abstract
 
 Tools for monitoring and exploring scheduler behavior and survey progress are an important element of the Rubin Observatory infrastructure.
