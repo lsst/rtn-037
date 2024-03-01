@@ -142,7 +142,7 @@ Reports implemented using parameterized notebooks should follow the same separat
 Although it is possible to implement complex processing and visualization using code embedded within notebooks, such code is difficult to debug, test, or reuse.
 So, functionality implemented within the parameterized notebooks proper should be limited to simple harness code that organizes calls to `schedview` or other external modules and glues them together: developers who find themselves writing notebook cells more than a few lines long should strongly consider extracting these cells into functions provided by an external module, usually within the `schedview.collect`, `schedview.compute`, or `schedivew.plot` submodules of `schedview`.
 
-### Simulation and schedular instance archive
+### Simulation and scheduler instance archive
 
 Many figure generation functions will require access to previously generated visit databases (actual, simulated, or hybrid), MAF metric values, and instances of the scheduler.
 Such databases and scheduler instances will usually be impossible or too computationally expensive to generate as needed, so archives that stores and provide access to databases and scheduler instances will be required.
