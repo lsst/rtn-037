@@ -69,7 +69,7 @@ Examples of figures produced by such generators include a table of astronomical 
    The `plot` submodule of `schedview` (`schedview.plot`) contains such `schedview` plotting code.
 4. **Workflom** and **presentation**. Workflow architectural elements use colletion, computation, and plotting elements to create finished visualizations.
    Examples include `panel` dashboards and `jupyter` notebooks (paramterized or not).
-   Although some driver code resides in the `schedview` module, it is not expect that all such code will be hosted there: some dashboards or notebooks that call collection, computation, and plotting elements and use the results to create finished reports or dashboards are expected to reside in other repositories as well.
+   Although some workflow and presentation code resides in the `schedview` module, it is not expect that all such code will be hosted there: some dashboards or notebooks that call collection, computation, and plotting elements and use the results to create finished reports or dashboards are expected to reside in other repositories as well.
 
 Generation of a figure may sometimes requrire multiple collection, munging, or computation components, if multiple sets of data will overplotted on the same figure.
 
@@ -79,11 +79,15 @@ This design permits but does not require such code reuse.
 ### Simulation generators
 
 Several visualizations will require revised values for survey metrics, calculated using simulations starting from a specific time (e.g. the current time) and running through the end of the survey.
-The `opsim` and `maf` submodules of the `rubin_sim` module will be used to run the simulations and calculate corresponding metrics, but infrastructure is required to automatically (and also manually) launch such simulations, collect and archive the results (including scheduler snapshots, `opsim` output, and `maf` output), and provide and interface to provide access to these data.
+The `rubin-scheduler` and `rubin-sim`  (containing `MAF`) software packages run simulations and metrics, but additional infrastructure to launch these suites of simulations and archive the results, including both the raw simulation results and the metrics derived from them.
+Often these simulations will need to be launched automatically on a periodic basis.
+For example, simulations that support the pre-night briefing will need to be run automatically every day.
+In addition, users will need to launch these suites manually using slightly customized parameters.
+For example, if users wish to compare pre-night briefings made with the default and alternate versions of the scheduler, it should be easy for them to run the same suite of simulations with the alternate version as well, whenever it becomes available.
 
 The survey simulator will need to run automatically under a variety of conditions:
 
-1. During the day before each night of observing, a set of simulations will need to be run for the following night (and maybe two nights) under a variety of weather conditions and starting times. Likely examples include:
+1. During the day before each night of observing, a suite of simulations will need to be run for the following night (and maybe two nights) under a variety of weather conditions and starting times. Likely examples include:
 
    1. Good seeing, first exposure exactly at the nominal starting time.
    2. Good seeing, first exposure a few minutes later than the nominal starting time (simulating a late start due to technical or operational delays).
@@ -91,47 +95,63 @@ The survey simulator will need to run automatically under a variety of condition
    4. Good seeing, first exposure two hours later than the nominal starting time (simulating a delayed start due to weather).
    5. Cloud, wind, and seeing conditions predicted by meteorologists, first exposure exactly at the nominal starting time or when the weather is first predicted to be good enough to start observing, whichever is earlier.
 
-2. On a periodic basis (daily? weekly? quarterly?), a set of simulations will need to be run showing how the achieved data collected in that period affects predicted final metrics. Likely examples include:
+2. On a periodic basis, suites of simulations will need to be run showing how the achieved data collected in that period affects predicted final metrics. Likely examples include:
 
    1. A simulation beginning at the end of the period, starting with the current actual state of the survey and running through the end of the survey.
    2. A simulation beginning at the start of the period, and running through the end of the survey using baseline conditions. Comparison with the previous simulation will show how differences between the actual and baseline predicted exposures affect the final survey.
    3. A simulation beginning at the end of the period and running through the end of the survey in baseline weather conditions, including no visits during the period in question. This simulation demonstrates how the worst possible observing in that period would have affected the final survey.
    4. A simulation beginning at the start of the period and running through the end of the survey, with no clouds, wind, or bad seeing during the perioud under study, and baseline conditions thereafter. This simulation will show how the best possible observing in the period affects the final survey.
 
-For each of these survey, a suite of MAF metrics will need to be evaluated at the current time and the end of the survey.
+   For each of these simulations, a suite of MAF metrics will need to be evaluated at the current time and the end of the survey.
 
-The simulation generator will also store resultant visit databases, MAF metrics, and snapshots of the scheduler instances will need to be saved in visit database archives along with corresponding metadata.
-
-In addition to running automatically, the simulation generator will also need to be configured and run manually.
-Such manually run simulations will differ from those run using `opsim` directly in that it will handle interactions with an archive a simulations and derived data automatically.
+The simulation generator will also store resultant visit databases, MAF metrics, and snapshots of the scheduler instances in an archive.
+This archive will need to be 
 
 ### Dashboards
 
-One way in which users can view visualization generated by ``schedview`` is through dashboards, interactive server-backed web pages that use ``schedview`` (and maybe other tools) to arrange visualizations on a compact user interface.
-Dashboards included within ``schedview`` proper should be built using the [``holoviz panel``](https://panel.holoviz.org) module using its [declaritive API](https://panel.holoviz.org/how_to/param/index.html).
+One way in which users can view visualization generated by `schedview` is through dashboards, interactive server-backed web pages that use `schedview` (and maybe other tools) to arrange visualizations on a compact user interface.
+Dashboards included within `schedview` proper should be built using the [`holoviz panel`](https://panel.holoviz.org) module using its [declaritive API](https://panel.holoviz.org/how_to/param/index.html).
 
-Each dashboard included in the ``schedview`` module should be a submodule of the ``schedview.app`` submodule, and consist of a parameterized class (subclass of ``param.Parameterized``) with any data to be visualized as ``param.Parameter`` attributes of this class.
-Dependencies between these members, the widgets used to load and manipulate them, and the visualizations made from them are then managed by members of this class, declared using the ``param.depends`` decorator.
+Each dashboard included in the `schedview` module should be a submodule of the `schedview.app` submodule, and consist of a parameterized class (subclass of `param.Parameterized`) with any data to be visualized as `param.Parameter` attributes of this class.
+Dependencies between these members, the widgets used to load and manipulate them, and the visualizations made from them are then managed by members of this class, declared using the `param.depends` decorator.
 
-The functionality of a dashboard submodule of ``schedview`` should be limited to features specific to that dashboard; functionalty that load data, performs computations, creates visualizations, or performs other operations which may be useful in multiple dashboards should be contained in other modules on which that (and potentially other) dashboards can depend.
+The functionality of a dashboard submodule of `schedview` should be limited to features specific to that dashboard; functionalty that load data, performs computations, creates visualizations, or performs other operations which may be useful in multiple dashboards should be contained in other modules on which that (and potentially other) dashboards can depend.
 
 :::{note}
-It is expected that other dashboard and interfaces may be implemented outside of the ``schedview`` module, but may still use and depend of functionality in ``schedview``, for example to include one or two scheduler related visualizations in an interface mostly unrelated to the scheduler.
+It is expected that other dashboard and interfaces may be implemented outside of the `schedview` module, but may still use and depend of functionality in `schedview`, for example to include one or two scheduler related visualizations in an interface mostly unrelated to the scheduler.
 The design of such external uses is outside the scope of this document.
-This possibility does imply that care should be taken that other parts of ``schedview`` (e.g. implementations of functionality in the ``compute`` or ``plot`` submodules) not depend on the specific implementations of the dashboard described here.
+This possibility does imply that care should be taken that other parts of `schedview` (e.g. implementations of functionality in the `compute` or `plot` submodules) not depend on the specific implementations of the dashboard described here.
 :::
+
+### Rubin Science Platform's Notebook View
+
+The Rubin Science Platform (RSP) has a "notebook view" that provides a jupyterhub environment.
+RSP notebooks provide access to Rubin Observatory software and many data products, but RSP instances not running at the observatory do not provide access to all of the data sources available at the observatory.
+
+`rubin_scheduler`, `rubin_sim`, and `schedview` provide a collection of `python` modules to support flexible exploration of scheduler behavior and progress, both of previously completed observing and simulated future observing.
+Any of the submodules of `schedview` can be called from within `jupyter` notebooks, including the `collect`, `compute`, `plot`, and even `app` submodules described above.
+For example, a user can call elements of `collect`, `compute`, and `plot` to embed fully customizable processing and visualization.
+The can even create instances of dashboards defined in `app` to embed a dashboard within a notebook.
+
+### Parametrized Notebooks
+
+Using the [Times Square](https://sqr-062.lsst.io/) infrastructure, parameterized `jupyter` notebooks can also be used to to implement routine reporting: a reference to a template notebook and parameters set through a REST-style API can be embedded in a URL, which when requested executes the notebook (or retrieves a cached copy) and generates a report generated by the output of that notebook.
+
+For specific reports supported by `schedview`, the choice of whether to implement the report using a `panel` dashboard or using a Time Square parameterized notebook will need to be made on a case by case basis (and often either may produce acceptable results).
+Reports implemented using parameterized notebooks should follow the same separation of concerns as those implemented using dashboards.
+Although it is possible to implement complex processing and visualization using code embedded within notebooks, such code is difficult to debug, test, or reuse.
+So, functionality implemented within the parametrized notebooks proper should be limited to simple harness code that organizes calls to `schedview` or other external modules and glues them together: developers who find themselves writing notebook cells more than a few lines long should strongly consider extracting these cells into functions provided by an external module, usually within the `schedview.collect`, `schedview.compute`, or `schedivew.plot` submodules of `schedview`.
 
 ### Simulation and schedular instance archive
 
 Many figure generation functions will require access to previously generated visit databases (actual, simulated, or hybrid), MAF metric values, and instances of the scheduler.
 Such databases and scheduler instances will usually be impossible or too computationally expensive to generate as needed, so archives that stores and provide access to visit database and scheduler instances will be required.
-Such an archive will need to include metadate necessary to associate visit databases, MAF metrics, and instances of the sceduler with each other.
-There will be separate instances of this archive for different contexts: there will be one available at the observatory, and another on the RSP.
-These different instances may or may not share the same implementation or API.
+Such an archive will need to include metadate necessary to associate visit databases, MAF metrics, and instances of the scheduler with each other.
+There will be separate instances of this archive for different contexts.
 
-### Containers
-
-There will be a container for each dashboard, deployable at the observatory using kubernetes.
+The archecture for the simulation and scheduler insntance archive is under active development.
+An [outline of the current prototype](https://github.com/lsst/rubin_scheduler/blob/main/docs/archive.rst) can be found in the `docs` subdirectory of the `rubin_scheduler` github repositary.
+This prototype is not expected to be scalable, and will be redesigned before operations.
 
 ## Operational Contexts
 
