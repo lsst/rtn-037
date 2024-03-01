@@ -4,9 +4,6 @@
 .. abstract::
 
    An architecture for software to generate and present information needed to understand scheduler behavior and monitor survey progress is given. The scope of this architecture document is limited to elements specific to this task, except in so far as the architecture of other infrastructure is required to show how it fits into the environments within which it will operate.
-
-   :tocdepth: 1
-
 ```
 
 % Metadata such as the title, authors, and description are set in metadata.yaml
