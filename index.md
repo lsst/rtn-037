@@ -1,13 +1,5 @@
 # Architecture for Scheduler and Observing Progress Monitoring Software
 
-```{eval-rst}
-.. abstract::
-
-   An architecture for software to generate and present information needed to understand scheduler behavior and monitor survey progress is given. The scope of this architecture document is limited to elements specific to this task, except in so far as the architecture of other infrastructure is required to show how it fits into the environments within which it will operate.
-```
-
-% Metadata such as the title, authors, and description are set in metadata.yaml
-
 ## Abstract
 
 Tools for monitoring and exploring scheduler behavior and survey progress are an important element of the Rubin Observatory infrastructure.
