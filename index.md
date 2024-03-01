@@ -67,7 +67,7 @@ Examples of figures produced by such generators include a table of astronomical 
    For example, `schedview` includes a function to plot camera pointings with the footprint outline over a healpix map, but the general purpose functionality for making sky maps (including plotting healpix maps and polygons) is provided by a separate module (`uranography`) in a different repository.
    In this way, general purpose plotting code can be reused without requiring `schedview` and its scheduler-specific dependencies.
    The `plot` submodule of `schedview` (`schedview.plot`) contains such `schedview` plotting code.
-4. **Driver**. Driver architectural elements use colletion, computation, and plotting elements to create finished visualizations.
+4. **Workflom** and **presentation**. Workflow architectural elements use colletion, computation, and plotting elements to create finished visualizations.
    Examples include `panel` dashboards and `jupyter` notebooks (paramterized or not).
    Although some driver code resides in the `schedview` module, it is not expect that all such code will be hosted there: some dashboards or notebooks that call collection, computation, and plotting elements and use the results to create finished reports or dashboards are expected to reside in other repositories as well.
 
