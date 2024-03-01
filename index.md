@@ -153,73 +153,11 @@ The archecture for the simulation and scheduler insntance archive is under activ
 An [outline of the current prototype](https://github.com/lsst/rubin_scheduler/blob/main/docs/archive.rst) can be found in the `docs` subdirectory of the `rubin_scheduler` github repositary.
 This prototype is not expected to be scalable, and will be redesigned before operations.
 
-## Operational Contexts
+% ## Operational Contexts
 
 % Viewpoint described by IEEE 1016 5.2, Hyde 11.2.2.1
 % This wiewpoint sets scope and system boundaries: what is external, what is internal
 % provides a "black box" persepctive on the design subject
-
-### The Rubin Observatory Site
-
-:::{note}
-TODO: What piece of infrastructure provides the scheduler instances (currently pickles)? If not through the EFD, the source should be mentioned here.
-:::
-
-:::{note}
-TODO: What are the names of the components that implement the observing queue? The scheduler monitoring software can benefit from direct intergration with it, so entries on the queue can be traced to specific scheduler decisions for visualization.
-:::
-
-First-look Analysis and Feedback Functionalty (FAFF) breakout group is addressing the question of how project will provide on-the-fly analysis and display of telemetry and other data at the observatory.
-The group has catalogued existing resources, and identified where they need to be augmented, or where new resources need to be constructed, and made recommendations about what resources should be used (SITCOMTN-025).
-The group is currently defining how users will interact with existing metrics, analyses, and other artifacts, developing a set of use cases and metrics that need to be scheduled for implementation, creating a corresponding task list and schedule, and preparing user-level training (SITCOMTN-030).
-The visualization tools within the scope of this document must be able to operate within the context of the resources and interfaces described by the FAFF breakout group.
-SITCOMTN-025 recommends the creation of visualizations using Bokeh applications, to be incorporated into the observatory displays that are provided by the LSST Observatory Visualization Environement (LOVE).
-
-:::{note}
-TODO: describe the sources of data the visualization software will need to use, including the EFD and whatever provides the scheduler pickles (or whatever the pickles will be replaced with).
-:::
-
-At the observatory, the scheduler and observing progress monitoring software will run on containers deployed using kubernetes.
-The containers will include:
-
-- The simulator will retrieve a configured instance of the scheduler, complete simulations both nightly and "on demand," and store the results.
-- The pre-night briefing generator will provide a web-base dashboard giving an overview of the active or upcoming night. It will load the configured instance of the scheduler and one or more simulations of the upcoming night, and provide a web-based dashboard giving an overview of the upcoming night.
-- `schedview` will provide a web-based interface that allows the user to select an instance of the scheduler from snapshots, visualize the state, and explore its behavior.
-- A night report tool will read completed visits and metadata (e.g. from the Engineering and Facility Database), snapshots of the scheduler, and provide a web-based dashboard allowing exploration of the progress and scheduler behavior of the night, calling out indications possible problems.
-
-:::{note}
-- TODO: Identify the source of scheduler instances.
-- TODO: Identify the archive of results of scheduler simulation.
-- TODO: Name the component that runs the simulations.
-- TODO: Name the pre-night briefing generator.
-- TODO: Name the night report tool.
-:::
-
-### Rubin Science Platform's Notebook View
-
-The Rubin Science Platform (RSP) has a "notebook view" that provides a jupyterhub environment.
-RSP notebooks provide access to Rubin Observatory software and many data products, but RSP instances not running at the observatory do not provide access to all of the data sources available at the observatory.
-
-Scheduler and observing progress monitoring tools will provide a collection of `python` modules to support flexible exploration of scheduler behavior and progress, both of previously completed observing and simulated future observing.
-These modules will include:
-
-- **collection** The `collection` module retrieves data needed for exploration and visualization, and makes it available within the `jupyter` notebook.
-- **simulation** Utilities that simplify the execution of `opsim` simulations in the context of understanding past or hypothetical situations, or from a given starting point to the a given time in the future, may be required. Most of the code involved will be contained in `opsim` itself, but some tools to launch simulations with appropriate parameters, archive and organize results, and otherwise intergrate it into the monitoring or progress context may be needed.
-- **plotting** Specialized figure for specific kinds of scheduler or progress data will be supported in a `plots` submodule. Examples will include maps in custom sky projections and hourglass plots. In most cases, however, `holoviews` should be usable directly on data returned by the `collection` module, so normal plots (e.g. scatter plots and histograms) will not need specialized code.
-- **dashboards** Collections of plots and controls that support specific use cases hand be implemented as dashboards that be displayed within a jupyter notebook.
-
-### Parametrized Notebooks
-
-Instead of being developed ad-hoc, standard jupyter notebooks can be published with customizable parameters to implement live dashboards and reports (SQR-062, SITCOMTN-025).
-Progress and scheduler visualizations should support inclusion in these reports.
-
-Parametrized notebooks will require the same set of modules as the RSP context.
-
-### Local
-
-Developers will want to use visualization tools locally, for example on their own laptops.
-Code for this context may also be useful even in the RSP notebook. For example, code for a "local" context will need to be able to used data stored in arbitrary local files.
-It may be usefull to bypass the production data provided in the RSP and use specially crafted local files for testing.
 
 % Module
 % ======
