@@ -88,7 +88,7 @@ The survey simulator will need to run automatically under a variety of condition
    For each of these simulations, a suite of MAF metrics will need to be evaluated at the current time and at the end of the survey.
 
 The simulation generator will also store resultant visit databases, MAF metrics, and snapshots of the scheduler instances in an archive.
-This archive will need to be 
+
 
 ### Dashboards
 
