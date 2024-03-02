@@ -1,0 +1,17 @@
+[technote]
+id = "RTN-037"
+series_id = "RTN"
+canonical_url = "https://rtn-037.lsst.io/"
+github_url = "https://github.com/lsst/rtn-037"
+github_default_branch = "main"
+organization.name = "Vera C. Rubin Observatory"
+organization.ror = "https://ror.org/048g3cy84"
+license.id = "CC-BY-4.0"
+[[technote.authors]]
+name = {given = "Eric H.", family = "Neilsen, Jr."}
+internal_id = "neilsene"
+orcid = "https://orcid.org/0000-0002-7357-0317"
+[[technote.authors.affiliations]]
+name = "Fermi National Accelerator Laboratory"
+internal_id = "Fermilab"
+address = "P. O. Box 500, Batavia, IL 60510, USA"
